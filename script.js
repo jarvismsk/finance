@@ -2,10 +2,8 @@ const chatContainer = document.getElementById('chat-container');
 const userInput = document.getElementById('user-input');
 const sendButton = document.getElementById('send-button');
 const resetButton = document.getElementById('reset-button');
-
 let sessionId = localStorage.getItem('sessionId') || Date.now().toString();
 localStorage.setItem('sessionId', sessionId);
-
 let currentCompany = localStorage.getItem('currentCompany') || '';
 let chatHistory = JSON.parse(localStorage.getItem('chatHistory')) || [];
 
@@ -27,10 +25,8 @@ function loadChatHistory() {
 async function sendMessage() {
     const message = userInput.value.trim();
     if (message === '') return;
-
     addMessage('You', message);
     userInput.value = '';
-
     try {
         if (!currentCompany) {
             const response = await fetch('https://glacial-wildwood-18418-0f87b0df699e.herokuapp.com/api/get_stock_code', {
@@ -38,6 +34,9 @@ async function sendMessage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ company_name: message, session_id: sessionId })
             });
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
             const data = await response.json();
             currentCompany = data.stock_symbol;
             localStorage.setItem('currentCompany', currentCompany);
@@ -49,6 +48,9 @@ async function sendMessage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ question: message, stock_symbol: currentCompany, session_id: sessionId })
             });
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
             const data = await response.json();
             addMessage('Assistant', data.answer);
         }
@@ -81,7 +83,7 @@ if (chatHistory.length === 0) {
     addMessage('Assistant', "Welcome! Please enter a company name to start.");
 }
 
-// Perform cleanup periodically instead of on page unload
+// Perform cleanup periodically
 setInterval(() => {
     fetch('https://glacial-wildwood-18418-0f87b0df699e.herokuapp.com/api/cleanup', {
         method: 'POST',
