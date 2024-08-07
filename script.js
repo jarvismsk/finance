@@ -33,7 +33,7 @@ async function sendMessage() {
 
     try {
         if (!currentCompany) {
-            const response = await fetch('http://127.0.0.1:5000/api/get_stock_code', {
+            const response = await fetch('https://glacial-wildwood-18418-0f87b0df699e.herokuapp.com/api/get_stock_code', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ company_name: message, session_id: sessionId })
@@ -44,7 +44,7 @@ async function sendMessage() {
             addMessage('Assistant', `Stock symbol for ${message}: ${currentCompany}`);
             addMessage('Assistant', "What would you like to know about this company?");
         } else {
-            const response = await fetch('http://127.0.0.1:5000/api/answer_question', {
+            const response = await fetch('https://glacial-wildwood-18418-0f87b0df699e.herokuapp.com/api/answer_question', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ question: message, stock_symbol: currentCompany, session_id: sessionId })
@@ -83,7 +83,7 @@ if (chatHistory.length === 0) {
 
 // Perform cleanup periodically instead of on page unload
 setInterval(() => {
-    fetch('http://127.0.0.1:5000/api/cleanup', {
+    fetch('https://glacial-wildwood-18418-0f87b0df699e.herokuapp.com/api/cleanup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ session_id: sessionId })
