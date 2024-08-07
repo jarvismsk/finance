@@ -6,19 +6,22 @@ let sessionId = localStorage.getItem('sessionId') || Date.now().toString();
 localStorage.setItem('sessionId', sessionId);
 let currentCompany = localStorage.getItem('currentCompany') || '';
 let chatHistory = JSON.parse(localStorage.getItem('chatHistory')) || [];
+
 function addMessage(sender, message) {
     const messageElement = document.createElement('p');
-    messageElement.innerHTML = `${sender}: ${message}`;
+    messageElement.innerHTML = `<strong>${sender}:</strong> ${message}`;
     chatContainer.appendChild(messageElement);
     chatContainer.scrollTop = chatContainer.scrollHeight;
     
     chatHistory.push({ sender, message });
     localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
 }
+
 function loadChatHistory() {
     chatContainer.innerHTML = '';
     chatHistory.forEach(msg => addMessage(msg.sender, msg.message));
 }
+
 async function sendMessage() {
     const message = userInput.value.trim();
     if (message === '') return;
@@ -56,10 +59,12 @@ async function sendMessage() {
         addMessage('System', 'An error occurred. Please try again.');
     }
 }
+
 sendButton.addEventListener('click', sendMessage);
 userInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') sendMessage();
 });
+
 resetButton.addEventListener('click', () => {
     localStorage.clear();
     sessionId = Date.now().toString();
@@ -69,12 +74,15 @@ resetButton.addEventListener('click', () => {
     loadChatHistory();
     addMessage('Assistant', "Welcome! Please enter a company name to start.");
 });
+
 // Load chat history on page load
 loadChatHistory();
+
 // Initial message if chat history is empty
 if (chatHistory.length === 0) {
     addMessage('Assistant', "Welcome! Please enter a company name to start.");
 }
+
 // Perform cleanup periodically
 setInterval(() => {
     fetch('https://glacial-wildwood-18418-0f87b0df699e.herokuapp.com/api/cleanup', {
